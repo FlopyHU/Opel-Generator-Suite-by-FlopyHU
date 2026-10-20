@@ -4,35 +4,42 @@
 
 ## 🌍 English
 
-### 📖 The Story Behind the Project
-This project was born out of personal necessity. When I bought my Opel, it came without the factory **Car Pass** card. Since I needed the security codes for diagnostics and modifications (Via OP-COM), I hooked up my tools, read the data directly from the car's head unit (Using an Eprom reader), and successfully recovered the credentials. 
+### 📖 About the Project
+When I bought my Opel, it came without the factory **Car Pass**. Since official dealerships charge a hefty amount just to pull up or provide the security codes, I decided to take matters into my own hands. I hooked up my tools, dumped the EEPROM data directly from the car's hardware, and recovered the credentials myself from the head unit.
 
-Once I had the codes, I didn't just want them written on a scrap piece of paper—I wanted a proper, authentic-looking physical card. That’s why I designed this Car Pass generator. Later, I realized it would be amazing to have a custom-designed **Service Book** to match, so I added the booklet generator to the suite as well. 
+Instead of writing the codes on a scrap paper, I wanted a clean, authentic-looking physical card—so I built this Car Pass generator. Later on, I figured a matching custom **Service Book** would be a great addition to the suite. 
 
-The **Modern (Dark Cover) theme** was specifically created for my personal **Opel Astra H** project, but I wanted to make the tool versatile, so I also included a Classic theme. Now, I am sharing this tool with the community so anyone can easily generate, fill, and print their own documentation!
-
-### 💡 A Note on Development
-I won't lie: I used the power of **Gemini AI** to speed up the process, make coding more efficient, and refine some features. However, without my solid programming background and technical knowledge, this project could have never been fully realized, put together, and deployed.
+The **Modern (Dark Cover)** theme is tailored straight for my own **Opel Astra H** project, but I added a Classic theme to keep it versatile. Feel free to use it, print it, and share it with the community!
 
 ---
 
 ## 🇭🇺 Magyar
 
-### 📖 A projekt története
-Ez a projekt személyes szükségletből született. Amikor megvásároltam az Opelemet, sajnos nem kaptam hozzá gyári **Car Pass** kártyát. Mivel a diagnosztikához és a módosításokhoz szükségem volt a biztonsági kódokra (OP-COM-hoz), rádugtam a megfelelő eszközöket, kiolvastam az adatokat közvetlenül a fejegységből(Eprom olvasóval), és sikeresen megszereztem a kódokat.
+### 📖 A projekt háttérsztorija
+Amikor megvettem az Opelemet, gyári **Car Pass** kártya nem járt hozzá. Mivel a márkaszervizben egy horror összeget kértek volna el csak azért, hogy lekérjék és megadják a gyári biztonsági kódot, úgy döntöttem, megoldom magam. Rádugatam a cuccokat, kiolvastam az EEPROM-ot, és kinyertem a biztonsági kódot a fejegységből.
 
-Miután megvoltak az adatok, nem akartam egy cetlire felkarcolni őket, szerettem volna egy igényes, gyárias megjelenésű fizikai kártyát. Ezért készítettem el ezt a Car Pass generátort. Később jött az ötlet, hogy milyen szuper lenne egy hozzá passzoló, egyedi tervezésű **Szervizkönyv** is, így a Szervizkönyv generátort is hozzáadtam az oldalhoz.
+Ahelyett, hogy egy gyűrött cetlire jegyzeteltem volna fel őket, akartam egy normális, gyári kinézetű kártyát, így született meg a Car Pass generátor. Később jött az ötlet, hogy kéne mellé egy passzoló, egyedi **Szervizkönyv** is, úgyhogy azt is lefejlesztettem hozzá.
 
-A **Modern (Sötét) témát** kifejezetten a saját **Opel Astra H** projektemhez terveztem, de szerettem volna, ha a szoftver sokoldalú, így bekerült egy klasszikus világos téma is. Végül úgy döntöttem, feldobom a netre az egészet, hogy bárki a közösségből könnyen kitölthesse és kinyomtathassa a saját autós dokumentációját!
-
-### 💡 Egy gondolat a fejlesztésről
-Nem fogok hazudni: a fejlesztés során segítségül vettem a **Gemini AI** tudását, hogy gyorsabb és könnyebb legyen a megvalósítás, illetve a funkciók finomítása. Viszont a programozói múltam, a logikám és a technikai háttértudásom nélkül ez a projekt sosem állt volna össze egy működő, kész egésszé.
+A **Modern (Sötét borítós)** téma a saját **Opel Astra H** projektem ízlését tükrözi, de raktam bele klasszikus világos dizájnt is, hogy másnak is tetszhessen. Használjátok nyugodtan!
 
 ---
 
 ## 🛠️ Features / Funkciók
-*   **Global Data Sync:** Enter vehicle data once, and it populates both the Car Pass and the Service Book. (Globális adatszinkronizáció).
-*   **Custom Modules Checker:** Pre-mark programmed modules (ECM, BCM, CIM, GID, CID, etc.) – perfect for retrofitted Opels. (Gyári extrák és modulok listázása).
-*   **Print-Ready Layouts:** Designed to be printed at 100% scale, cut, and folded. (Nyomtatásra kész elrendezés).
+
+* **Global Data Sync / Globális adatszinkronizáció:** Enter vehicle details (VIN, Model, Engine) once in the Car Pass sidebar, and they automatically populate the Service Book as well.
+* **Dual Design Themes / Kétféle dizájn téma:** Switch between the sleek **Modern (Dark Cover)** layout and the traditional **Classic (Light Cover)** style.
+* **Installed Modules Checker / Telepített modulok ellenőrzője:** Pre-marked checkboxes for factory modules (ECM, BCM, CIM, GID, CID, ABS, etc.) plus the ability to add custom modules on the fly.
+* **Dynamic Log Pages / Dinamikus naplóoldalak:** Easily scale and generate up to 20 maintenance & modification log pages in the Service Book.
+* **Bilingual Interface / Kétnyelvű felület:** Instant language toggle between English and Hungarian with fully localized placeholders and UI elements.
+* **PDF Export & Print Guide / PDF mentési segédlet:** Custom modal popup guiding users smoothly through the native print-to-PDF process at 100% scale.
+* **Live Visitor Counter / Valós idejű látogatószámláló:** Integrated all-time visitor tracker with local storage and API fallback redundancy.
+
+
+---
+
+## 🚀 Usage / Használat
+1. Open the tool in any modern web browser. / Nyisd meg az oldalt bármiylen modern keresővel.
+2. Fill out your vehicle specs and security credentials. / Töltsd ki a mezőket a saját autód adataival.
+3. Switch between tabs to customize your digital Service Book and print or export it directly to PDF. / Válts a menük között, válaszd ki a stílust és nyomtasd ki direktben az oldalról, vagy exportáld PDF-be.
 
 Feel free to use it and share it with other Opel enthusiasts! / Használjátok bátran, és osszátok meg a többi Opelessel is! 🚗💨
