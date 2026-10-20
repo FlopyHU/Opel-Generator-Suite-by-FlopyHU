@@ -11,9 +11,6 @@
         margin: 0;
     }
 
-
-
-    
     body {
         margin: 0;
         padding: 0;
@@ -363,6 +360,31 @@
     .log-table th, .log-table td { padding: 10px 8px; text-align: left; }
     .log-table td { border: 1px solid #999; height: 45px; }
 
+    /* --- VISITOR COUNTER STYLES --- */
+    #visitor-counter {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        background-color: #0b1136;
+        color: #ffffff;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        border: 1px solid #374151;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.3s ease;
+    }
+    #count-number {
+        color: #eab308;
+        font-size: 14px;
+    }
+
     /* --- BULLETPROOF PRINT STYLES --- */
     @media print {
         html, body { 
@@ -672,6 +694,11 @@
         </div>
     </div>
 
+    <!-- VISITOR COUNTER -->
+    <div id="visitor-counter" class="hide-on-print">
+        <span data-i18n="lbl_visitors">Visitors:</span> <span id="count-number">...</span>
+    </div>
+
     <!-- ============================================== -->
     <!-- GLOBAL JAVASCRIPT & TRANSLATIONS               -->
     <!-- ============================================== -->
@@ -723,6 +750,7 @@
                 lbl_cd_aux: "Auxiliary Media",
                 cp_mod_title: "Vehicle Security Credentials",
                 cp_mod_auth: "AUTHORISED ACCESS PASS",
+                lbl_visitors: "Visitors:",
                 
                 /* Placeholders */
                 ph_model: "e.g. OPEL ASTRA H",
@@ -781,6 +809,7 @@
                 lbl_cd_aux: "Kiegészítő Média",
                 cp_mod_title: "Gépjármű Biztonsági Kódok",
                 cp_mod_auth: "HIVATALOS HOZZÁFÉRÉSI KÁRTYA",
+                lbl_visitors: "Látogatók:",
                 
                 /* Placeholders */
                 ph_model: "pl. OPEL ASTRA H",
@@ -944,76 +973,30 @@
             });
         }
 
+        // Visitor Counter Initialization
+        function updateCounter() {
+            const namespace = "flopyhu-opel-project";
+            const key = "suite-counter";
+            
+            // Fixed the URL formatting to ensure it attempts to hit the API correctly
+            fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.value) {
+                        document.getElementById('count-number').innerText = data.value;
+                    }
+                })
+                .catch(error => {
+                    // Fallback if the free API is down/blocked
+                    document.getElementById('count-number').innerText = "1";
+                });
+        }
+
         window.onload = function() {
             updateLogPages();
+            updateCounter();
         };
 
     </script>
-
-
-
-
-
-<div id="visitor-counter">
-  Látogatók: <span id="count-number">...</span>
-</div>
-
-<script>
-
-function updateCounter() {
-  const namespace = "flopyhu-opel-project";
-  const key = "suite-counter";
-  
-  fetch(`https://countapi.xyz{namespace}/${key}`)
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('count-number').innerText = data.value;
-    })
-    .catch(error => {
-      
-      document.getElementById('count-number').innerText = "1";
-    });
-}
-
-
-document.addEventListener("DOMContentLoaded", updateCounter);
-</script>
-
-<style>
-
-#visitor-counter {
-  position: fixed;
-  bottom: 15px;
-  right: 15px;
-  z-index: 9999;
-  background-color: #2f2f2f;
-  color: #ffffff;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-family: Arial, sans-serif;
-  font-size: 11px;
-  font-weight: bold;
-  border-left: 3px solid #eab308;
-  opacity: 0.8;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  pointer-events: none; 
-}
-#count-number {
-  color: #eab308;
-  margin-left: 3px;
-}
-
-
-@media print {
-  #visitor-counter {
-    display: none !important;
-  }
-}
-</style>
-
-
-
-
-    
 </body>
 </html>
