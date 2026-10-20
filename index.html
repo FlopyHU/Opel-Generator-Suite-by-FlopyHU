@@ -22,6 +22,15 @@
         flex-direction: column;
         height: 100vh;
         overflow: hidden;
+        /* Disables text selection for extra protection */
+        user-select: none; 
+        -webkit-user-select: none;
+    }
+
+    /* Override selection blocker just for input fields so they still work */
+    input, select {
+        user-select: auto;
+        -webkit-user-select: auto;
     }
 
     /* --- TOP NAVIGATION & LANGUAGE SWITCHER --- */
@@ -222,6 +231,59 @@
         box-sizing: border-box;
     }
 
+    /* --- CUSTOM PDF MODAL --- */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(11, 17, 54, 0.85);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal-box {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        border-top: 5px solid #eab308;
+    }
+    .modal-box h3 {
+        margin-top: 0;
+        color: #0b1136;
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+    .modal-box p {
+        color: #4b5563;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 25px;
+        white-space: pre-line;
+    }
+    .modal-ok-btn {
+        background: #eab308;
+        color: #0b1136;
+        border: none;
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: 900;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: transform 0.1s, background 0.2s;
+    }
+    .modal-ok-btn:hover {
+        background: #facc15;
+        transform: scale(1.05);
+    }
+
     /* --- SUBTLE WATERMARK --- */
     .print-watermark {
         position: absolute;
@@ -366,7 +428,7 @@
         margin-right: 10px; flex-shrink: 0; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
         font-family: Arial, sans-serif; font-size: 14px; font-weight: 900; color: #d32f2f;
-        user-select: none; transition: transform 0.1s;
+        transition: transform 0.1s;
     }
     .checkbox-box:hover { background-color: #f3f4f6; transform: scale(1.1); }
     .module-text { font-size: 11px; font-weight: bold; color: #333; text-transform: uppercase; }
@@ -381,7 +443,7 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        z-index: 9999;
+        z-index: 9000;
         background-color: #0b1136;
         color: #ffffff;
         padding: 8px 15px;
@@ -406,10 +468,24 @@
         body { height: auto; overflow-y: auto; }
         .top-nav { flex-direction: column; height: auto; padding: 15px; gap: 15px; }
         .nav-center { width: 100%; justify-content: center; }
+        
         .app-view { flex-direction: column; height: auto; overflow: visible; }
-        .sidebar { width: 100%; box-sizing: border-box; border-bottom: 2px solid #ddd; padding: 20px; }
-        .main-content { padding: 20px 10px; align-items: flex-start; }
-        /* The horizontal scroll is crucial here to view the fixed mm sizes without breaking them */
+        .sidebar { width: 100%; height: auto; box-sizing: border-box; border-bottom: 2px solid #ddd; padding: 20px; }
+        
+        /* Ensures the fixed mm sizes can scroll horizontally on phone without breaking */
+        .main-content { 
+            padding: 20px 10px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            overflow-x: auto; 
+            align-items: flex-start; /* Prevents center-cut-off bug */
+        }
+        
+        .card-wrapper, .a4-page {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .instructions { max-width: none; }
         #visitor-counter { bottom: 10px; right: 10px; padding: 6px 10px; font-size: 10px; }
     }
@@ -482,6 +558,15 @@
         </div>
     </div>
 
+    <!-- CUSTOM PDF EXPORT MODAL -->
+    <div id="pdf-modal" class="modal-overlay hide-on-print">
+        <div class="modal-box">
+            <h3 id="pdf-modal-title" data-i18n="pdf_title">Save as PDF</h3>
+            <p id="pdf-modal-text" data-i18n="pdf_desc">To save as a PDF:\n\n1. In the Print window, change the 'Destination' or 'Printer' to 'Save as PDF'.\n2. Click Save.</p>
+            <button class="modal-ok-btn" onclick="triggerNativePrint()" data-i18n="btn_ok">Understood</button>
+        </div>
+    </div>
+
     <!-- ============================================== -->
     <!-- APP VIEW 1: CAR PASS GENERATOR                 -->
     <!-- ============================================== -->
@@ -534,7 +619,7 @@
 
             <div class="action-buttons">
                 <button class="print-btn" onclick="window.print()"><span data-i18n="btn_print">🖨️ Print</span></button>
-                <button class="print-btn pdf-btn" onclick="exportPDF()"><span data-i18n="btn_pdf">💾 Export PDF</span></button>
+                <button class="print-btn pdf-btn" onclick="showPDFModal()"><span data-i18n="btn_pdf">💾 Export PDF</span></button>
             </div>
         </div>
 
@@ -652,7 +737,7 @@
             
             <div class="action-buttons">
                 <button class="print-btn" onclick="window.print()"><span data-i18n="btn_print">🖨️ Print</span></button>
-                <button class="print-btn pdf-btn" onclick="exportPDF()"><span data-i18n="btn_pdf">💾 Export PDF</span></button>
+                <button class="print-btn pdf-btn" onclick="showPDFModal()"><span data-i18n="btn_pdf">💾 Export PDF</span></button>
             </div>
         </div>
 
@@ -787,8 +872,10 @@
                 cp_mod_auth: "AUTHORISED ACCESS PASS",
                 lbl_visitors: "Visitors:",
                 
-                /* PDF Alert */
-                msg_pdf_alert: "To save as a PDF:\n\n1. In the Print window, change the 'Destination' or 'Printer' to 'Save as PDF'.\n2. Click Save.",
+                /* PDF Modal */
+                pdf_title: "Save as PDF",
+                pdf_desc: "To save as a high-quality PDF:\n\n1. Wait for the Print window to open.\n2. Change the 'Destination' or 'Printer' to 'Save as PDF'.\n3. Click Save.",
+                btn_ok: "Understood",
                 
                 /* Placeholders */
                 ph_model: "e.g. OPEL ASTRA H",
@@ -849,8 +936,10 @@
                 cp_mod_auth: "HIVATALOS HOZZÁFÉRÉSI KÁRTYA",
                 lbl_visitors: "Látogatók:",
                 
-                /* PDF Alert */
-                msg_pdf_alert: "PDF mentéséhez:\n\n1. A felugró nyomtatási ablakban a 'Nyomtató' (vagy Cél) legördülő menüben válaszd a 'Mentés PDF-ként' (Save as PDF) lehetőséget.\n2. Kattints a Mentés gombra.",
+                /* PDF Modal */
+                pdf_title: "Mentés PDF-ként",
+                pdf_desc: "A tökéletes minőségű PDF mentéséhez:\n\n1. Várd meg a felugró Nyomtatási ablakot.\n2. A 'Nyomtató' (vagy Cél) menüben válaszd a 'Mentés PDF-ként' (Save as PDF) opciót.\n3. Kattints a Mentés gombra.",
+                btn_ok: "Értettem",
                 
                 /* Placeholders */
                 ph_model: "pl. OPEL ASTRA H",
@@ -1014,32 +1103,71 @@
             });
         }
 
-        // Export to PDF function (using native high-res print to PDF)
-        function exportPDF() {
-            alert(translations[currentLang].msg_pdf_alert);
-            setTimeout(() => {
-                window.print();
-            }, 500);
+        // --- Custom PDF Modal Functions ---
+        function showPDFModal() {
+            document.getElementById('pdf-modal').classList.add('active');
         }
 
-        // Visitor Counter Initialization with No-Store Cache
+        function triggerNativePrint() {
+            document.getElementById('pdf-modal').classList.remove('active');
+            setTimeout(() => {
+                window.print();
+            }, 300); // slight delay to ensure modal hides smoothly
+        }
+
+        // --- Robust LocalStorage + API Visitor Counter ---
         function updateCounter() {
             const namespace = "flopyhu";
             const key = "opel-suite-counter";
+            const counterEl = document.getElementById('count-number');
             
+            // 1. Immediately show the last known saved count if available
+            const savedCount = localStorage.getItem('flopy_visitor_count');
+            if (savedCount) {
+                counterEl.innerText = savedCount;
+            }
+
+            // 2. Fetch the new count from the server
             fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/up`, { 
                 method: 'GET',
                 cache: 'no-store' 
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('API Error');
+                return response.json();
+            })
             .then(data => {
-                if(data.count) {
-                    document.getElementById('count-number').innerText = data.count;
+                if(data && data.count !== undefined) {
+                    counterEl.innerText = data.count;
+                    // Save successful fetch to local storage (A Változó)
+                    localStorage.setItem('flopy_visitor_count', data.count);
                 }
             })
             .catch(error => {
-                document.getElementById('count-number').innerText = "1";
+                console.warn("Counter API blocked, falling back to LocalStorage.");
+                // If the fetch fails AND we have nothing saved, show '1'.
+                if (!savedCount) {
+                    counterEl.innerText = "1";
+                }
             });
+        }
+
+        // --- DEVTOOLS & COPY PROTECTION SCRIPT ---
+        // Disables Right-Click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Disables common developer shortcuts
+        document.onkeydown = function(e) {
+            // F12
+            if (e.keyCode == 123) { return false; }
+            // Ctrl+Shift+I (Inspector)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
+            // Ctrl+Shift+C (Element Selector)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }
+            // Ctrl+Shift+J (Console)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
+            // Ctrl+U (View Source)
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
         }
 
         window.onload = function() {
