@@ -156,20 +156,32 @@
         color: #374151;
         text-align: center;
     }
-    .print-btn {
-        background-color: #0b1136;
-        color: white;
-        padding: 15px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
+    
+    .action-buttons {
+        display: flex;
+        gap: 10px;
         margin-top: 10px;
         margin-bottom: 30px;
+    }
+    .print-btn {
+        flex: 1;
+        background-color: #0b1136;
+        color: white;
+        padding: 12px 5px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
         transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
     }
     .print-btn:hover { background-color: #1a235c; }
+    .pdf-btn { background-color: #d32f2f; }
+    .pdf-btn:hover { background-color: #b71c1c; }
     
     .add-btn {
         padding: 8px 12px;
@@ -189,6 +201,7 @@
     .main-content {
         flex: 1;
         overflow-y: auto;
+        overflow-x: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -205,6 +218,8 @@
         max-width: 210mm;
         color: #374151;
         line-height: 1.5;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     /* --- SUBTLE WATERMARK --- */
@@ -230,6 +245,7 @@
         background: white;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         position: relative;
+        flex-shrink: 0;
     }
     .card-half {
         width: 85.6mm;
@@ -385,6 +401,19 @@
         font-size: 14px;
     }
 
+    /* --- RESPONSIVE MOBILE VIEW (SCREEN ONLY) --- */
+    @media screen and (max-width: 850px) {
+        body { height: auto; overflow-y: auto; }
+        .top-nav { flex-direction: column; height: auto; padding: 15px; gap: 15px; }
+        .nav-center { width: 100%; justify-content: center; }
+        .app-view { flex-direction: column; height: auto; overflow: visible; }
+        .sidebar { width: 100%; box-sizing: border-box; border-bottom: 2px solid #ddd; padding: 20px; }
+        .main-content { padding: 20px 10px; align-items: flex-start; }
+        /* The horizontal scroll is crucial here to view the fixed mm sizes without breaking them */
+        .instructions { max-width: none; }
+        #visitor-counter { bottom: 10px; right: 10px; padding: 6px 10px; font-size: 10px; }
+    }
+
     /* --- BULLETPROOF PRINT STYLES --- */
     @media print {
         html, body { 
@@ -503,11 +532,14 @@
                 <input type="text" data-target="dyn-cd-ser" data-default="-" placeholder="-">
             </div>
 
-            <button class="print-btn" onclick="window.print()" data-i18n="btn_print_cp">🖨️ Print Car Passes</button>
+            <div class="action-buttons">
+                <button class="print-btn" onclick="window.print()"><span data-i18n="btn_print">🖨️ Print</span></button>
+                <button class="print-btn pdf-btn" onclick="exportPDF()"><span data-i18n="btn_pdf">💾 Export PDF</span></button>
+            </div>
         </div>
 
         <div class="main-content">
-            <div class="instructions" data-i18n="inst_cp">
+            <div class="instructions hide-on-print" data-i18n="inst_cp">
                 <strong>Data Sync:</strong> The Vehicle Model, VIN, and Engine fields are synced globally. Edit them here, and they will populate your Service Book too!<br><br>
                 <strong>Print Settings:</strong> Set scale to <strong>100%</strong> and enable "Background graphics". Cut the dashed lines and fold down the middle.
             </div>
@@ -618,11 +650,14 @@
                 <input type="number" id="inp-pages" value="1" min="1" max="20" onchange="updateLogPages()">
             </div>
             
-            <button class="print-btn" onclick="window.print()" data-i18n="btn_print_sb">🖨️ Print Booklet</button>
+            <div class="action-buttons">
+                <button class="print-btn" onclick="window.print()"><span data-i18n="btn_print">🖨️ Print</span></button>
+                <button class="print-btn pdf-btn" onclick="exportPDF()"><span data-i18n="btn_pdf">💾 Export PDF</span></button>
+            </div>
         </div>
 
         <div class="main-content theme-modern" id="booklet-wrapper">
-            <div class="instructions" data-i18n="inst_sb">
+            <div class="instructions hide-on-print" data-i18n="inst_sb">
                 <strong>Automated Printing:</strong> Set the number of log pages in the sidebar. Set your printer scale to <strong>100%</strong>.
             </div>
 
@@ -722,8 +757,8 @@
                 lbl_radser: "Radio Serial No",
                 lbl_cd: "CD-Changer Type/Code",
                 lbl_cdser: "CD-Changer Serial No",
-                btn_print_cp: "🖨️ Print Car Passes",
-                btn_print_sb: "🖨️ Print Booklet",
+                btn_print: "🖨️ Print",
+                btn_pdf: "💾 Export PDF",
                 inst_cp: "<strong>Data Sync:</strong> The Vehicle Model, VIN, and Engine fields are synced globally. Edit them here, and they will populate your Service Book too!<br><br><strong>Print Settings:</strong> Set scale to <strong>100%</strong> and enable \"Background graphics\". Cut the dashed lines and fold down the middle.",
                 inst_sb: "<strong>Automated Printing:</strong> Set the number of log pages in the sidebar. Set your printer scale to <strong>100%</strong>.",
                 lbl_theme: "Cover Design Theme",
@@ -751,6 +786,9 @@
                 cp_mod_title: "Vehicle Security Credentials",
                 cp_mod_auth: "AUTHORISED ACCESS PASS",
                 lbl_visitors: "Visitors:",
+                
+                /* PDF Alert */
+                msg_pdf_alert: "To save as a PDF:\n\n1. In the Print window, change the 'Destination' or 'Printer' to 'Save as PDF'.\n2. Click Save.",
                 
                 /* Placeholders */
                 ph_model: "e.g. OPEL ASTRA H",
@@ -781,8 +819,8 @@
                 lbl_radser: "Rádió Sorozatszám",
                 lbl_cd: "CD-Tár Típus / Kód",
                 lbl_cdser: "CD-Tár Sorozatszám",
-                btn_print_cp: "🖨️ Car Pass Nyomtatása",
-                btn_print_sb: "🖨️ Szervizkönyv Nyomtatása",
+                btn_print: "🖨️ Nyomtatás",
+                btn_pdf: "💾 PDF Mentés",
                 inst_cp: "<strong>Adatszinkronizáció:</strong> A Modell, Alvázszám és Motorkód mezők közösek. Amit itt beírsz, az a Szervizkönyvben is megjelenik!<br><br><strong>Nyomtatási beállítások:</strong> Állítsd a méretezést <strong>100%</strong>-ra, és engedélyezd a háttérgrafikákat a böngészőben. Nyomtatás után vágd ki a szaggatott vonal mentén, és hajtsd félbe.",
                 inst_sb: "<strong>Automatikus nyomtatás:</strong> Az oldalsávban beállíthatod, hány üres naplóoldalt szeretnél. Nyomtatáskor a méretezést hagyd <strong>100%</strong>-on!",
                 lbl_theme: "Borító Stílusa",
@@ -810,6 +848,9 @@
                 cp_mod_title: "Gépjármű Biztonsági Kódok",
                 cp_mod_auth: "HIVATALOS HOZZÁFÉRÉSI KÁRTYA",
                 lbl_visitors: "Látogatók:",
+                
+                /* PDF Alert */
+                msg_pdf_alert: "PDF mentéséhez:\n\n1. A felugró nyomtatási ablakban a 'Nyomtató' (vagy Cél) legördülő menüben válaszd a 'Mentés PDF-ként' (Save as PDF) lehetőséget.\n2. Kattints a Mentés gombra.",
                 
                 /* Placeholders */
                 ph_model: "pl. OPEL ASTRA H",
@@ -973,23 +1014,32 @@
             });
         }
 
-        // Visitor Counter Initialization
+        // Export to PDF function (using native high-res print to PDF)
+        function exportPDF() {
+            alert(translations[currentLang].msg_pdf_alert);
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+
+        // Visitor Counter Initialization with No-Store Cache
         function updateCounter() {
-            const namespace = "flopyhu-opel-project";
-            const key = "suite-counter";
+            const namespace = "flopyhu";
+            const key = "opel-suite-counter";
             
-            // Fixed the URL formatting to ensure it attempts to hit the API correctly
-            fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
-                .then(response => response.json())
-                .then(data => {
-                    if(data.value) {
-                        document.getElementById('count-number').innerText = data.value;
-                    }
-                })
-                .catch(error => {
-                    // Fallback if the free API is down/blocked
-                    document.getElementById('count-number').innerText = "1";
-                });
+            fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/up`, { 
+                method: 'GET',
+                cache: 'no-store' 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.count) {
+                    document.getElementById('count-number').innerText = data.count;
+                }
+            })
+            .catch(error => {
+                document.getElementById('count-number').innerText = "1";
+            });
         }
 
         window.onload = function() {
