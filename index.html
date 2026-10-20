@@ -950,5 +950,33 @@
 
     </script>
 
+
+<!-- Ide jön a számláló, közvetlenül a body vége elé -->
+<div id="visitor-counter">
+  <img src="https://seeyoufarm.com" alt="Hits"/>
+</div>
+
+<style>
+#visitor-counter {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 9999;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+#visitor-counter:hover {
+  opacity: 1;
+}
+@media print {
+  #visitor-counter {
+    display: none !important;
+  }
+}
+</style>
+
+
+
+    
 </body>
 </html>
