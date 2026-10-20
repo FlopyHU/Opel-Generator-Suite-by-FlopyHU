@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opel Generator Suite by Flopy</title>
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #e5e7eb;
+        font-family: Arial, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* --- TOP NAVIGATION & LANGUAGE SWITCHER --- */
+    .top-nav {
+        background-color: #0b1136;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        height: 50px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 20;
+        flex-shrink: 0;
+    }
+    .nav-brand {
+        font-weight: 900;
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+    .nav-brand span { color: #eab308; }
+    
+    .nav-center {
+        display: flex;
+        height: 100%;
+    }
+    .nav-btn {
+        background: transparent;
+        color: #9ca3af;
+        border: none;
+        padding: 0 20px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        height: 100%;
+        transition: all 0.2s;
+        text-transform: uppercase;
+    }
+    .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+    .nav-btn.active {
+        color: #fff;
+        background: #1a235c;
+        border-bottom: 3px solid #eab308;
+    }
+
+    .lang-switcher {
+        display: flex;
+        gap: 8px;
+    }
+    .lang-btn {
+        background: #1a235c;
+        border: 1px solid #374151;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .lang-btn img {
+        width: 14px;
+        height: auto;
+    }
+    .lang-btn:hover, .lang-btn.active-lang {
+        background: #eab308;
+        color: #0b1136;
+        border-color: #eab308;
+    }
+
+    /* --- APP VIEWS --- */
+    .app-view {
+        display: none;
+        flex-direction: row;
+        flex: 1;
+        height: calc(100vh - 50px);
+        overflow: hidden;
+    }
+    .app-view.active {
+        display: flex;
+    }
+
+    /* --- SIDEBAR STYLING --- */
+    .sidebar {
+        width: 340px;
+        background: #ffffff;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        padding: 25px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        z-index: 10;
+        flex-shrink: 0;
+    }
+    .sidebar h2 {
+        margin-top: 0;
+        font-size: 18px;
+        color: #0b1136;
+        border-bottom: 2px solid #eab308;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 15px; }
+    .form-group label {
+        display: block;
+        font-size: 11px;
+        font-weight: bold;
+        color: #4b5563;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        box-sizing: border-box;
+    }
+    .section-title {
+        font-size: 13px;
+        background: #f3f4f6;
+        padding: 8px;
+        margin: 20px -25px 15px -25px;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #374151;
+        text-align: center;
+    }
+    .print-btn {
+        background-color: #0b1136;
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        transition: background-color 0.2s;
+    }
+    .print-btn:hover { background-color: #1a235c; }
+    
+    .add-btn {
+        padding: 8px 12px;
+        background: #0b1136;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: bold;
+        white-space: nowrap;
+        margin-left: 8px;
+    }
+    .add-btn:hover { background-color: #1a235c; }
+
+    /* --- MAIN CONTENT AREA --- */
+    .main-content {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px;
+    }
+    .instructions {
+        margin-bottom: 30px;
+        padding: 15px 25px;
+        background: #fff;
+        border-left: 4px solid #3b82f6;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        text-align: left;
+        max-width: 210mm;
+        color: #374151;
+        line-height: 1.5;
+    }
+
+    /* --- SUBTLE WATERMARK --- */
+    .print-watermark {
+        position: absolute;
+        bottom: 5mm;
+        right: 8mm;
+        font-size: 6.5px;
+        color: #9ca3af;
+        opacity: 0.4;
+        font-family: Arial, sans-serif;
+        pointer-events: none;
+        letter-spacing: 0.5px;
+    }
+
+    /* --- CAR PASS SPECIFIC STYLES --- */
+    .card-wrapper {
+        display: flex;
+        width: 171.2mm; 
+        height: 54mm;
+        margin-bottom: 30mm;
+        outline: 1px dashed #999;
+        background: white;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    .card-half {
+        width: 85.6mm;
+        height: 54mm;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+    }
+    .cp-fold-line {
+        width: 1px;
+        height: 100%;
+        background-color: #ddd;
+        border-right: 1px dashed #999;
+    }
+    .classic-front {
+        padding: 5mm;
+        border: 1px solid #000;
+        border-radius: 3px;
+        margin: 1.5mm;
+        height: 51mm;
+        width: 82.6mm;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        position: relative;
+    }
+    .classic-logo-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4mm; padding-top: 1mm; }
+    .classic-opel-text { font-family: 'Arial Black', sans-serif; font-size: 26px; color: #0b1136; letter-spacing: -1px; }
+    .classic-logo-img { width: 32px; height: 32px; object-fit: contain; }
+    .classic-stripe-yellow { height: 5.5px; background-color: #eab308; margin-bottom: 1.5px; }
+    .classic-stripe-grey { height: 1.5px; background-color: #9ca3af; margin-bottom: 4px; }
+    .classic-title { font-weight: bold; color: #9ca3af; font-size: 21px; letter-spacing: -0.5px; }
+    
+    .classic-back {
+        padding: 3mm 4mm;
+        border: 1px solid #000;
+        border-radius: 3px;
+        margin: 1.5mm;
+        height: 51mm;
+        width: 82.6mm;
+        box-sizing: border-box;
+        font-size: 8px;
+        line-height: 1.35;
+        background: #fff;
+        position: relative;
+    }
+    .cp-data-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5px; }
+    .cp-data-label { font-weight: bold; width: 36%; font-family: Arial, sans-serif; font-size: 8px; }
+    .cp-data-value {
+        width: 62%; border: 1px solid #000; padding: 0 3px; height: 11px; 
+        display: flex; align-items: center; text-transform: uppercase; 
+        font-family: 'Courier New', monospace; font-size: 9px; white-space: nowrap; overflow: hidden;
+    }
+
+    .modern-front {
+        background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%);
+        color: #fff; padding: 6mm; border-radius: 4px; margin: 1.5mm;
+        height: 51mm; width: 82.6mm; box-sizing: border-box; box-shadow: inset 0 0 0 1px #444; position: relative;
+    }
+    .modern-logo-img { position: absolute; top: 6mm; right: 6mm; width: 28px; height: 28px; object-fit: contain; filter: invert(1); }
+    .modern-title { font-family: 'Arial', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 2px; }
+    .modern-opel { font-family: 'Arial', sans-serif; font-weight: 900; font-size: 24px; letter-spacing: 1px; margin-bottom: 5px; color: #e0e0e0; }
+    .modern-accent { width: 100%; height: 2px; background: linear-gradient(90deg, #d32f2f, #ff6666); margin-bottom: 5px; }
+    .modern-sub { font-size: 8px; color: #aaa; letter-spacing: 1px; }
+
+    .modern-back {
+        background-color: #222; color: #eee; padding: 4mm; border-radius: 4px; margin: 1.5mm;
+        height: 51mm; width: 82.6mm; box-sizing: border-box; box-shadow: inset 0 0 0 1px #444; position: relative;
+    }
+    .modern-data-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 2px; margin-bottom: 3px; }
+    .modern-label { color: #888; font-size: 7.5px; text-transform: uppercase; }
+    .modern-val { font-family: 'Courier New', monospace; font-size: 9px; color: #fff; text-align: right; white-space: nowrap; overflow: hidden; }
+
+
+    /* --- SERVICE BOOK SPECIFIC STYLES --- */
+    .a4-page {
+        width: 210mm;
+        height: 297mm;
+        min-height: 297mm;
+        flex-shrink: 0;
+        background: white;
+        color: #333;
+        margin-bottom: 20mm;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        position: relative;
+        box-sizing: border-box;
+        padding: 20mm;
+        overflow: hidden;
+    }
+    
+    .theme-classic .cover-page { border: 2px solid #0b1136; }
+    .theme-classic .sb-page-header { border-bottom: 5px solid #eab308; position: relative; padding-bottom: 10px; margin-bottom: 15mm; }
+    .theme-classic .sb-page-header::after { content: ''; position: absolute; bottom: -9px; left: 0; width: 100%; height: 2px; background-color: #9ca3af; }
+    .theme-classic .sb-cover-title { color: #0b1136; }
+
+    .theme-modern .cover-page { background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%); color: #fff; }
+    .theme-modern .cover-page .logo-img { filter: invert(1); }
+    .theme-modern .sb-cover-title { color: #fff; }
+    
+    .theme-modern .inner-page .sb-page-header { border-bottom: 2px solid #d32f2f; margin-bottom: 15mm; padding-bottom: 10px; color: #222; }
+    .theme-modern .inner-page .logo-img { filter: none; opacity: 0.9; }
+
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .opel-header-text { font-family: 'Arial Black', sans-serif; font-size: 32px; letter-spacing: -1px; margin: 0; }
+    
+    .sb-cover-title { font-size: 38px; text-transform: uppercase; font-weight: 900; margin-top: 60mm; text-align: left; letter-spacing: 1px; line-height: 1.2; }
+    .sb-cover-subtitle { font-size: 16px; text-align: left; margin-top: 15px; color: #888; letter-spacing: 3px; font-weight: bold; }
+    
+    .sb-data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dotted #999; }
+    .sb-data-label { font-weight: bold; font-size: 12px; text-transform: uppercase; color: #555; }
+    .sb-data-value { font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; color: #000; }
+
+    .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin-top: 5mm; }
+    .module-item { display: flex; align-items: center; }
+    .checkbox-box { 
+        width: 14px; height: 14px; border: 1.5px solid #555; border-radius: 3px; 
+        margin-right: 10px; flex-shrink: 0; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-family: Arial, sans-serif; font-size: 14px; font-weight: 900; color: #d32f2f;
+        user-select: none; transition: transform 0.1s;
+    }
+    .checkbox-box:hover { background-color: #f3f4f6; transform: scale(1.1); }
+    .module-text { font-size: 11px; font-weight: bold; color: #333; text-transform: uppercase; }
+
+    .log-table { width: 100%; border-collapse: collapse; margin-top: 5mm; font-size: 12px; }
+    .log-table th { background-color: #f3f4f6; color: #333; font-weight: bold; text-transform: uppercase; font-size: 10px; border: 1px solid #999; }
+    .log-table th, .log-table td { padding: 10px 8px; text-align: left; }
+    .log-table td { border: 1px solid #999; height: 45px; }
+
+    /* --- BULLETPROOF PRINT STYLES --- */
+    @media print {
+        html, body { 
+            height: auto !important; 
+            min-height: auto !important; 
+            overflow: visible !important; 
+            display: block !important; 
+            background-color: #ffffff !important; 
+        }
+        .top-nav, .sidebar, .instructions { 
+            display: none !important; 
+        }
+        .app-view:not(.active) { 
+            display: none !important; 
+        }
+        .app-view.active { 
+            display: block !important; 
+            height: auto !important; 
+            overflow: visible !important; 
+        }
+        .main-content { 
+            padding: 0 !important; 
+            display: block !important; 
+            height: auto !important; 
+            overflow: visible !important; 
+        }
+        /* Elrejti azokat az elemeket nyomtatáskor, amik csak a kitöltéshez kellenek a weben */
+        .hide-on-print {
+            display: none !important;
+        }
+        
+        .a4-page { 
+            margin: 0 !important; 
+            box-shadow: none !important; 
+            width: 210mm !important;
+            height: 297mm !important;
+            page-break-after: always !important; 
+            break-after: page !important;
+            page-break-inside: avoid !important;
+            display: block !important;
+            position: relative !important;
+        }
+        
+        #app-carpass .main-content { padding-top: 20mm !important; }
+        .card-wrapper { box-shadow: none !important; page-break-inside: avoid !important; margin-bottom: 20mm !important; }
+        .checkbox-box { color: #000 !important; border-color: #000 !important; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- TOP NAVIGATION -->
+    <div class="top-nav">
+        <div class="nav-brand">Opel <span>Generator Suite</span></div>
+        <div class="nav-center">
+            <button class="nav-btn active" id="btn-carpass" onclick="switchTab('carpass')">Car Pass</button>
+            <button class="nav-btn" id="btn-servicebook" onclick="switchTab('servicebook')">Service Book</button>
+        </div>
+        <div class="lang-switcher">
+            <button class="lang-btn active-lang" id="lang-en" onclick="setLanguage('en')">
+                <img src="https://flagcdn.com/w20/gb.png" alt="EN"> EN
+            </button>
+            <button class="lang-btn" id="lang-hu" onclick="setLanguage('hu')">
+                <img src="https://flagcdn.com/w20/hu.png" alt="HU"> HU
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- APP VIEW 1: CAR PASS GENERATOR                 -->
+    <!-- ============================================== -->
+    <div id="app-carpass" class="app-view active">
+        
+        <div class="sidebar">
+            <h2 data-i18n="cp_title">Car Pass Details</h2>
+            
+            <div class="section-title" data-i18n="sec_shared">Shared Vehicle Data</div>
+            <div class="form-group">
+                <label data-i18n="lbl_model">Vehicle Model</label>
+                <input type="text" data-sync="model" data-target="dyn-model" data-default="VEHICLE MODEL" data-i18n-ph="ph_model" placeholder="e.g. OPEL ASTRA H">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_vin">VIN</label>
+                <input type="text" data-sync="vin" data-target="dyn-vin" data-default="-----------------" data-i18n-ph="ph_vin" placeholder="e.g. W0L00000000000000">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_eng">Engine Type/No</label>
+                <input type="text" data-sync="eng" data-target="dyn-eng" data-default="----------" data-i18n-ph="ph_eng" placeholder="e.g. Z17DTH">
+            </div>
+            
+            <div class="section-title" data-i18n="sec_security">Security Credentials</div>
+            <div class="form-group">
+                <label data-i18n="lbl_sec">Security Code</label>
+                <input type="text" data-target="dyn-sec" data-default="XXXX" data-i18n-ph="ph_sec" placeholder="e.g. 1234">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_key">Key No</label>
+                <input type="text" data-target="dyn-key" data-default="XXXX" data-i18n-ph="ph_key" placeholder="e.g. 9876">
+            </div>
+            
+            <div class="section-title" data-i18n="sec_radio">Infotainment</div>
+            <div class="form-group">
+                <label data-i18n="lbl_rad">Radio Type/Code</label>
+                <input type="text" data-target="dyn-rad" data-default="--- / ----" data-i18n-ph="ph_rad" placeholder="e.g. CD 30 / -">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_radser">Radio Serial No</label>
+                <input type="text" data-target="dyn-rad-ser" data-default="GM000000000000" data-i18n-ph="ph_radser" placeholder="e.g. GM123456789">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_cd">CD-Changer Type/Code</label>
+                <input type="text" data-target="dyn-cd" data-default="-" placeholder="-">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_cdser">CD-Changer Serial No</label>
+                <input type="text" data-target="dyn-cd-ser" data-default="-" placeholder="-">
+            </div>
+
+            <button class="print-btn" onclick="window.print()" data-i18n="btn_print_cp">🖨️ Print Car Passes</button>
+        </div>
+
+        <div class="main-content">
+            <div class="instructions" data-i18n="inst_cp">
+                <strong>Data Sync:</strong> The Vehicle Model, VIN, and Engine fields are synced globally. Edit them here, and they will populate your Service Book too!<br><br>
+                <strong>Print Settings:</strong> Set scale to <strong>100%</strong> and enable "Background graphics". Cut the dashed lines and fold down the middle.
+            </div>
+
+            <div class="card-wrapper">
+                <div class="card-half">
+                    <div class="classic-front">
+                        <div class="classic-logo-row">
+                            <div class="classic-opel-text">OPEL</div>
+                            <img src="https://static.cdnlogo.com/logos/o/70/opel.svg" class="classic-logo-img" alt="Classic Chrome Opel Logo">
+                        </div>
+                        <div class="classic-stripe-yellow"></div>
+                        <div class="classic-stripe-grey"></div>
+                        <div class="classic-title">Car Pass</div>
+                        <div class="print-watermark">Opel Car Pass generator by Flopy</div>
+                    </div>
+                </div>
+                <div class="cp-fold-line"></div>
+                <div class="card-half">
+                    <div class="classic-back">
+                        <div class="cp-data-row"><div class="cp-data-label">VIN</div><div class="cp-data-value dyn-vin">-----------------</div></div>
+                        <div class="cp-data-row"><div class="cp-data-label" data-i18n="lbl_sec">Security Code</div><div class="cp-data-value dyn-sec">XXXX</div></div>
+                        <div class="cp-data-row"><div class="cp-data-label" data-i18n="lbl_eng">Engine Type/No</div><div class="cp-data-value dyn-eng">----------</div></div>
+                        <div class="cp-data-row"><div class="cp-data-label" data-i18n="lbl_key">Key No</div><div class="cp-data-value dyn-key">XXXX</div></div>
+                        <div class="cp-data-row"><div class="cp-data-label" data-i18n="lbl_rad">Radio Type/Code</div><div class="cp-data-value dyn-rad">--- / ----</div></div>
+                        <div class="cp-data-row"><div class="cp-data-label">Serial No</div><div class="cp-data-value dyn-rad-ser">GM000000000000</div></div>
+                        <div class="cp-data-row"><div class="cp-data-label" data-i18n="lbl_cd">CD-Changer Type/Code</div><div class="cp-data-value dyn-cd">-</div></div>
+                        <div class="cp-data-row"><div class="cp-data-label">Serial No</div><div class="cp-data-value dyn-cd-ser">-</div></div>
+                        <div class="print-watermark">Car Pass generator by Flopy</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrapper">
+                <div class="card-half">
+                    <div class="modern-front">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Opel-Logo_2017.png?utm_source=hu.wikipedia.org&utm_campaign=index&utm_content=original" class="modern-logo-img" alt="Modern Opel Logo">
+                        <div class="modern-title" data-i18n="cp_mod_title">Vehicle Security Credentials</div>
+                        <div class="modern-opel">OPEL</div>
+                        <div class="modern-accent"></div>
+                        <div class="modern-sub dyn-model">VEHICLE MODEL</div>
+                        <div style="margin-top: 8px; font-size: 7px; color: #666;" data-i18n="cp_mod_auth">AUTHORISED ACCESS PASS</div>
+                        <div class="print-watermark">Opel Car Pass generator by Flopy</div>
+                    </div>
+                </div>
+                <div class="cp-fold-line"></div>
+                <div class="card-half">
+                    <div class="modern-back">
+                        <div class="modern-data-row"><div class="modern-label">VIN</div><div class="modern-val dyn-vin">-----------------</div></div>
+                        <div class="modern-data-row"><div class="modern-label" data-i18n="lbl_sec">Security Code</div><div class="modern-val dyn-sec" style="color: #ff6666;">XXXX</div></div>
+                        <div class="modern-data-row"><div class="modern-label" data-i18n="lbl_eng_spec">Engine Specification</div><div class="modern-val dyn-eng">----------</div></div>
+                        <div class="modern-data-row"><div class="modern-label" data-i18n="lbl_key">Key Identification</div><div class="modern-val dyn-key">XXXX</div></div>
+                        <div class="modern-data-row"><div class="modern-label" data-i18n="lbl_rad_info">Infotainment</div><div class="modern-val dyn-rad">--- / ----</div></div>
+                        <div class="modern-data-row"><div class="modern-label" data-i18n="lbl_rad_unit">Unit Serial</div><div class="modern-val dyn-rad-ser">GM000000000000</div></div>
+                        <div class="modern-data-row"><div class="modern-label" data-i18n="lbl_cd_aux">Auxiliary Media</div><div class="modern-val dyn-cd">-</div></div>
+                        <div class="print-watermark">Car Pass generator by Flopy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- APP VIEW 2: SERVICE BOOK GENERATOR             -->
+    <!-- ============================================== -->
+    <div id="app-servicebook" class="app-view">
+        
+        <div class="sidebar">
+            <h2 data-i18n="sb_title">Service Book Setup</h2>
+            
+            <div class="form-group">
+                <label data-i18n="lbl_theme">Cover Design Theme</label>
+                <select id="inp-theme">
+                    <option value="theme-modern" data-i18n="opt_modern">Modern (Dark Cover)</option>
+                    <option value="theme-classic" data-i18n="opt_classic">Classic (Light Cover)</option>
+                </select>
+            </div>
+
+            <div class="section-title" data-i18n="sec_shared">Shared Vehicle Data</div>
+            <div class="form-group">
+                <label data-i18n="lbl_model">Vehicle Model</label>
+                <input type="text" data-sync="model" data-target="dyn-model" data-default="VEHICLE MODEL" data-i18n-ph="ph_model" placeholder="e.g. OPEL ASTRA H">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_vin">VIN</label>
+                <input type="text" data-sync="vin" data-target="dyn-vin" data-default="-----------------" data-i18n-ph="ph_vin" placeholder="e.g. W0L00000000000000">
+            </div>
+            <div class="form-group">
+                <label data-i18n="lbl_eng">Engine Code</label>
+                <input type="text" data-sync="eng" data-target="dyn-eng" data-default="----------" data-i18n-ph="ph_eng" placeholder="e.g. Z17DTH">
+            </div>
+            
+            <div class="section-title" data-i18n="sec_sbdata">Service Book Data</div>
+            <div class="form-group">
+                <label data-i18n="lbl_reg">Registration Plate</label>
+                <input type="text" data-sync="reg" data-target="dyn-reg" data-default="----------" data-i18n-ph="ph_reg" placeholder="e.g. ABC-123">
+            </div>
+
+            <div class="section-title" data-i18n="sec_custommod">Add Custom Module</div>
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="text" id="new-module-name" data-i18n-ph="ph_mod" placeholder="e.g. DDS" style="flex: 1;">
+                <button class="add-btn" onclick="addCustomModule()" data-i18n="btn_add">+ ADD</button>
+            </div>
+            
+            <div class="section-title" data-i18n="sec_print_opts">Print Options</div>
+            <div class="form-group">
+                <label data-i18n="lbl_pages">Number of Log Pages</label>
+                <input type="number" id="inp-pages" value="1" min="1" max="20" onchange="updateLogPages()">
+            </div>
+            
+            <button class="print-btn" onclick="window.print()" data-i18n="btn_print_sb">🖨️ Print Booklet</button>
+        </div>
+
+        <div class="main-content theme-modern" id="booklet-wrapper">
+            <div class="instructions" data-i18n="inst_sb">
+                <strong>Automated Printing:</strong> Set the number of log pages in the sidebar. Set your printer scale to <strong>100%</strong>.
+            </div>
+
+            <!-- PAGE 1: COVER -->
+            <div class="a4-page cover-page">
+                <div class="sb-page-header flex-between">
+                    <h2 class="opel-header-text">OPEL</h2>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Opel-Logo_2017.png?utm_source=hu.wikipedia.org&utm_campaign=index&utm_content=original" class="logo-img cover-logo" alt="Opel Logo" style="width: 45px;">
+                </div>
+                
+                <div class="sb-cover-title" data-i18n="cover_title_text">Service &<br>Modification<br>Record</div>
+                <div class="sb-cover-subtitle dyn-model">VEHICLE MODEL</div>
+                
+                <div style="position: absolute; bottom: 30mm; width: calc(100% - 40mm); text-align: left;">
+                    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 3px; color: #888; font-weight: bold;" data-i18n="cover_footer">Official Owner Documentation</div>
+                </div>
+                <div class="print-watermark">Opel Servicebook generator by Flopy</div>
+            </div>
+
+            <!-- PAGE 2: VEHICLE IDENTIFICATION -->
+            <div class="a4-page inner-page">
+                <div class="sb-page-header flex-between">
+                    <h3 style="margin:0; text-transform: uppercase;" data-i18n="p2_heading">Vehicle Identification</h3>
+                    <img src="https://static.cdnlogo.com/logos/o/70/opel.svg" class="logo-img" alt="Opel Logo" style="width: 25px;">
+                </div>
+
+                <div class="sb-data-row"><div class="sb-data-label" data-i18n="lbl_model">Model</div><div class="sb-data-value dyn-model">-----------------</div></div>
+                <div class="sb-data-row"><div class="sb-data-label" data-i18n="lbl_vin">VIN</div><div class="sb-data-value dyn-vin">-----------------</div></div>
+                <div class="sb-data-row"><div class="sb-data-label" data-i18n="lbl_eng_spec">Engine Specification</div><div class="sb-data-value dyn-eng">----------</div></div>
+                <div class="sb-data-row"><div class="sb-data-label" data-i18n="lbl_reg">Registration</div><div class="sb-data-value dyn-reg">----------</div></div>
+
+                <h3 style="margin-top: 15mm; text-transform: uppercase; font-size: 14px; color: #555; border-bottom: 1px solid #ccc; padding-bottom: 5px;" data-i18n="p2_modules_heading">Installed Modules Checker</h3>
+                
+                <!-- This paragraph is hidden on print -->
+                <p class="hide-on-print" style="font-size: 11px; color: #888; margin-top: 0;" data-i18n="p2_modules_desc">Click the boxes to pre-mark modules currently installed and programmed in the vehicle.</p>
+                
+                <div class="modules-grid" id="modules-list">
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">ECM (Engine Control Module)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">TCM (Transmission Control)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">ABS/ESP (Brake / Stability)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">EHPS/EPS (Power Steering)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">BCM (Body Control Module)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">CIM (Column Integration)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">UEC (Underhood Elec. Centre)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">REC (Rear Elec. Centre)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">EHU (Head Unit / Radio)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">TID (Triple Info Display)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">BID (Board Info Display)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">MID (Multi Info Display)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">GID (Graphic Info Display)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">CID (Color Info Display)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">UHP (Mobile Phone Portal)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">ECC/SAC (Climate Control)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">SDM (Airbag / Diagnostic)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">AHL/AFL (Adaptive Lighting)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">ATWS/DWA (Alarm System)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">PEPS (Open & Start / Keyless)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">TPMS (Tire Pressure Monitor)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">CDC (Continuous Damping)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">PDM/DDM (Door Modules)</span></div>
+                    <div class="module-item"><div class="checkbox-box" onclick="toggleCheck(this)"></div> <span class="module-text">SRM (Sunroof Module)</span></div>
+                </div>
+                <div class="print-watermark">Opel Servicebook generator by Flopy</div>
+            </div>
+
+            <!-- DYNAMIC LOG PAGES CONTAINER -->
+            <div id="log-pages-container"></div>
+            
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- GLOBAL JAVASCRIPT & TRANSLATIONS               -->
+    <!-- ============================================== -->
+    <script>
+        const translations = {
+            en: {
+                carpass: "Car Pass",
+                servicebook: "Service Book",
+                cp_title: "Car Pass Details",
+                sb_title: "Service Book Setup",
+                sec_shared: "Shared Vehicle Data",
+                lbl_model: "Vehicle Model",
+                lbl_vin: "VIN",
+                lbl_eng: "Engine Type/No",
+                lbl_eng_spec: "Engine Specification",
+                sec_security: "Security Credentials",
+                lbl_sec: "Security Code",
+                lbl_key: "Key No",
+                sec_radio: "Infotainment",
+                lbl_rad: "Radio Type/Code",
+                lbl_radser: "Radio Serial No",
+                lbl_cd: "CD-Changer Type/Code",
+                lbl_cdser: "CD-Changer Serial No",
+                btn_print_cp: "🖨️ Print Car Passes",
+                btn_print_sb: "🖨️ Print Booklet",
+                inst_cp: "<strong>Data Sync:</strong> The Vehicle Model, VIN, and Engine fields are synced globally. Edit them here, and they will populate your Service Book too!<br><br><strong>Print Settings:</strong> Set scale to <strong>100%</strong> and enable \"Background graphics\". Cut the dashed lines and fold down the middle.",
+                inst_sb: "<strong>Automated Printing:</strong> Set the number of log pages in the sidebar. Set your printer scale to <strong>100%</strong>.",
+                lbl_theme: "Cover Design Theme",
+                opt_modern: "Modern (Dark Cover)",
+                opt_classic: "Classic (Light Cover)",
+                sec_sbdata: "Service Book Data",
+                lbl_reg: "Registration Plate",
+                sec_custommod: "Add Custom Module",
+                btn_add: "+ ADD",
+                sec_print_opts: "Print Options",
+                lbl_pages: "Number of Log Pages",
+                cover_title_text: "Service &<br>Modification<br>Record",
+                cover_footer: "Official Owner Documentation",
+                p2_heading: "Vehicle Identification",
+                p2_modules_heading: "Installed Modules Checker",
+                p2_modules_desc: "Click the boxes to pre-mark modules currently installed and programmed in the vehicle.",
+                p3_heading: "Maintenance & Mod Log",
+                tbl_date: "Date",
+                tbl_km: "Odometer (km)",
+                tbl_service: "Service / Modification",
+                tbl_notes: "Notes / Spec",
+                lbl_rad_info: "Infotainment",
+                lbl_rad_unit: "Unit Serial",
+                lbl_cd_aux: "Auxiliary Media",
+                cp_mod_title: "Vehicle Security Credentials",
+                cp_mod_auth: "AUTHORISED ACCESS PASS",
+                
+                /* Placeholders */
+                ph_model: "e.g. OPEL ASTRA H",
+                ph_vin: "e.g. W0L00000000000000",
+                ph_eng: "e.g. Z17DTH",
+                ph_sec: "e.g. 1234",
+                ph_key: "e.g. 9876",
+                ph_rad: "e.g. CD 30 / -",
+                ph_radser: "e.g. GM123456789",
+                ph_reg: "e.g. ABC-123",
+                ph_mod: "e.g. DDS"
+            },
+            hu: {
+                carpass: "Car Pass",
+                servicebook: "Szervizkönyv",
+                cp_title: "Car Pass Részletek",
+                sb_title: "Szervizkönyv Beállítások",
+                sec_shared: "Közös Járműadatok",
+                lbl_model: "Járműmodell",
+                lbl_vin: "Alvázszám (VIN)",
+                lbl_eng: "Motorkód / Szám",
+                lbl_eng_spec: "Motor Specifikáció",
+                sec_security: "Biztonsági Kódok",
+                lbl_sec: "Biztonsági Kód",
+                lbl_key: "Kulcsszám",
+                sec_radio: "Infotainment / Hifi",
+                lbl_rad: "Rádió Típus / Kód",
+                lbl_radser: "Rádió Sorozatszám",
+                lbl_cd: "CD-Tár Típus / Kód",
+                lbl_cdser: "CD-Tár Sorozatszám",
+                btn_print_cp: "🖨️ Car Pass Nyomtatása",
+                btn_print_sb: "🖨️ Szervizkönyv Nyomtatása",
+                inst_cp: "<strong>Adatszinkronizáció:</strong> A Modell, Alvázszám és Motorkód mezők közösek. Amit itt beírsz, az a Szervizkönyvben is megjelenik!<br><br><strong>Nyomtatási beállítások:</strong> Állítsd a méretezést <strong>100%</strong>-ra, és engedélyezd a háttérgrafikákat a böngészőben. Nyomtatás után vágd ki a szaggatott vonal mentén, és hajtsd félbe.",
+                inst_sb: "<strong>Automatikus nyomtatás:</strong> Az oldalsávban beállíthatod, hány üres naplóoldalt szeretnél. Nyomtatáskor a méretezést hagyd <strong>100%</strong>-on!",
+                lbl_theme: "Borító Stílusa",
+                opt_modern: "Modern (Sötét borító)",
+                opt_classic: "Klasszikus (Világos borító)",
+                sec_sbdata: "Szervizkönyv Adatok",
+                lbl_reg: "Rendszám",
+                sec_custommod: "Egyedi Modul Hozzáadása",
+                btn_add: "+ HOZZÁADÁS",
+                sec_print_opts: "Nyomtatási Beállítások",
+                lbl_pages: "Naplóoldalak száma",
+                cover_title_text: "Szerviz- és<br>Módosítási<br>Napló",
+                cover_footer: "Hivatalos Tulajdonosi Dokumentáció",
+                p2_heading: "Jármű Azonosító Adatai",
+                p2_modules_heading: "Telepített Modulok Listája",
+                p2_modules_desc: "Kattints a négyzetekre azon modulok megjelöléséhez, amelyek az autóba telepítve és felprogramozva lettek. (Ez a szöveg nem látszik nyomtatáskor!)",
+                p3_heading: "Karbantartási és Módosítási Napló",
+                tbl_date: "Dátum",
+                tbl_km: "Km óra állása",
+                tbl_service: "Szerviz / Módosítás leírása",
+                tbl_notes: "Megjegyzés / Alkatrész spec.",
+                lbl_rad_info: "Infotainment / Hifi",
+                lbl_rad_unit: "Fejegység Sorozatszám",
+                lbl_cd_aux: "Kiegészítő Média",
+                cp_mod_title: "Gépjármű Biztonsági Kódok",
+                cp_mod_auth: "HIVATALOS HOZZÁFÉRÉSI KÁRTYA",
+                
+                /* Placeholders */
+                ph_model: "pl. OPEL ASTRA H",
+                ph_vin: "pl. W0L00000000000000",
+                ph_eng: "pl. Z17DTH",
+                ph_sec: "pl. 1234",
+                ph_key: "pl. 9876",
+                ph_rad: "pl. CD 30 / -",
+                ph_radser: "pl. GM123456789",
+                ph_reg: "pl. ABC-123",
+                ph_mod: "pl. DDS"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('lang-en').classList.toggle('active-lang', lang === 'en');
+            document.getElementById('lang-hu').classList.toggle('active-lang', lang === 'hu');
+
+            // Translate Text elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Translate Placeholders dynamically
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (translations[lang][key]) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
+
+            document.getElementById('btn-carpass').textContent = translations[lang].carpass;
+            document.getElementById('btn-servicebook').textContent = translations[lang].servicebook;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('app-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        function updateDisplays(targetClass, value, defaultVal) {
+            const elements = document.querySelectorAll('.' + targetClass);
+            elements.forEach(el => {
+                el.textContent = value.trim() !== '' ? value : defaultVal;
+            });
+        }
+
+        function syncInputValues(syncGroup, value) {
+            const inputs = document.querySelectorAll(`input[data-sync="${syncGroup}"]`);
+            inputs.forEach(inp => {
+                if(inp.value !== value) inp.value = value;
+            });
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName.toLowerCase() === 'input') {
+                const syncGroup = e.target.getAttribute('data-sync');
+                const targetClass = e.target.getAttribute('data-target');
+                const defaultVal = e.target.getAttribute('data-default') || '';
+                const val = e.target.value;
+
+                if (syncGroup) {
+                    syncInputValues(syncGroup, val);
+                }
+                
+                if (targetClass) {
+                    updateDisplays(targetClass, val, defaultVal);
+                }
+            }
+        });
+
+        const themeSelect = document.getElementById('inp-theme');
+        const wrapper = document.getElementById('booklet-wrapper');
+        const coverLogo = document.querySelector('.cover-logo');
+        
+        themeSelect.addEventListener('change', function(e) {
+            wrapper.className = 'main-content ' + e.target.value;
+            if (e.target.value === 'theme-modern') {
+                coverLogo.src = 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Opel-Logo_2017.png?utm_source=hu.wikipedia.org&utm_campaign=index&utm_content=original';
+            } else {
+                coverLogo.src = 'https://static.cdnlogo.com/logos/o/70/opel.svg';
+            }
+        });
+
+        function toggleCheck(element) {
+            if (element.innerText === '') {
+                element.innerText = 'X';
+            } else {
+                element.innerText = '';
+            }
+        }
+
+        function addCustomModule() {
+            const inputEl = document.getElementById('new-module-name');
+            const moduleName = inputEl.value.trim();
+            
+            if (moduleName !== '') {
+                const grid = document.getElementById('modules-list');
+                const newDiv = document.createElement('div');
+                newDiv.className = 'module-item';
+                newDiv.innerHTML = `<div class="checkbox-box" onclick="toggleCheck(this)">X</div> <span class="module-text">${moduleName}</span>`;
+                grid.appendChild(newDiv);
+                
+                inputEl.value = '';
+            }
+        }
+        
+        document.getElementById('new-module-name').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addCustomModule();
+        });
+
+        function updateLogPages() {
+            let count = parseInt(document.getElementById('inp-pages').value) || 1;
+            if (count < 1) count = 1;
+            if (count > 20) count = 20;
+            
+            const container = document.getElementById('log-pages-container');
+            container.innerHTML = '';
+            
+            for(let i=0; i<count; i++) {
+                const div = document.createElement('div');
+                div.className = 'a4-page inner-page';
+                div.innerHTML = `
+                    <div class="sb-page-header flex-between">
+                        <h3 style="margin:0; text-transform: uppercase;" data-i18n="p3_heading">Maintenance & Mod Log</h3>
+                        <img src="https://static.cdnlogo.com/logos/o/70/opel.svg" class="logo-img" alt="Opel Logo" style="width: 25px;">
+                    </div>
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th style="width:15%;" data-i18n="tbl_date">Date</th>
+                                <th style="width:20%;" data-i18n="tbl_km">Odometer (km)</th>
+                                <th style="width:30%;" data-i18n="tbl_service">Service / Modification</th>
+                                <th style="width:35%;" data-i18n="tbl_notes">Notes / Spec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${'<tr><td></td><td></td><td></td><td></td></tr>'.repeat(11)}
+                        </tbody>
+                    </table>
+                    <div class="print-watermark">Opel Servicebook generator by Flopy</div>
+                `;
+                container.appendChild(div);
+            }
+            
+            // Re-apply current language translations to newly created elements
+            document.querySelectorAll('#log-pages-container [data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    el.innerHTML = translations[currentLang][key];
+                }
+            });
+        }
+
+        window.onload = function() {
+            updateLogPages();
+        };
+
+    </script>
+
+</body>
+</html>
