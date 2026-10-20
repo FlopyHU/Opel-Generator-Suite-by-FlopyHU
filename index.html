@@ -951,29 +951,66 @@
     </script>
 
 
-<!-- Ide jön a számláló, közvetlenül a body vége elé -->
+
+
+
 <div id="visitor-counter">
-  <img src="https://seeyoufarm.com" alt="Hits"/>
+  Látogatók: <span id="count-number">...</span>
 </div>
 
+<script>
+
+function updateCounter() {
+  const namespace = "flopyhu-opel-project";
+  const key = "suite-counter";
+  
+  fetch(`https://countapi.xyz{namespace}/${key}`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('count-number').innerText = data.value;
+    })
+    .catch(error => {
+      
+      document.getElementById('count-number').innerText = "1";
+    });
+}
+
+
+document.addEventListener("DOMContentLoaded", updateCounter);
+</script>
+
 <style>
+
 #visitor-counter {
   position: fixed;
-  bottom: 10px;
-  right: 10px;
+  bottom: 15px;
+  right: 15px;
   z-index: 9999;
+  background-color: #2f2f2f;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  border-left: 3px solid #eab308;
   opacity: 0.8;
-  transition: opacity 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  pointer-events: none; 
 }
-#visitor-counter:hover {
-  opacity: 1;
+#count-number {
+  color: #eab308;
+  margin-left: 3px;
 }
+
+
 @media print {
   #visitor-counter {
     display: none !important;
   }
 }
 </style>
+
 
 
 
