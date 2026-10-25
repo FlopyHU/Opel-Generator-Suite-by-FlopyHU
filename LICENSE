@@ -1,21 +1,36 @@
-MIT License (Customized)
+Custom Open Source License (FlopyHU Opel Generator Suite)
 
 Copyright (c) 2026 FlopyHU
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+to use, copy, modify, publish, and distribute the original software free of 
+charge (excluding any right to sell or commercialize), subject to the following 
+strict conditions:
 
-1. The above copyright notice, author attribution (FlopyHU), and this permission 
-   notice shall be included in all copies or substantial portions of the Software.
-2. Modifying the software to remove, alter, or bypass the built-in watermark, core 
-   branding, or developer-tool protections is strictly prohibited.
-3. Brand assets (such as vehicle logos) are accessed dynamically via live web 
-   integration and are never stored, hosted, or distributed locally within this 
-   repository; the author accepts no liability for third-party asset hosting claims.
+1. Free-to-Use Mandate: This tool is strictly free. Selling, commercializing, or 
+   charging any form of payment for this software or any modified version is 
+   strictly prohibited. 
+2. Fork & Contribution Workflow (No Plagiarism Clones): You are free to share and 
+   distribute the original software. However, simply copy-pasting or duplicating 
+   this repository into a separate, independent personal repository to republish it 
+   as your own project is prohibited. All modifications, additions, and new modules 
+   should be developed via GitHub forks and contributed back to the official 
+   repository through pull requests so contributions can be officially integrated 
+   and credited on the main project page.
+3. Meaningful Changes vs. Cosmetic Edits: Minor or superficial UI customizations 
+   alone do not justify a separate standalone fork. Substantial functional additions 
+   (such as new tabs or modules) are welcomed through the official contribution pipeline.
+4. Branding, Watermark & Protections: Modifying the software to remove, alter, or 
+   bypass the built-in watermark, core author branding (FlopyHU), or developer-tool 
+   protections is strictly prohibited.
+5. Attribution & Copyright: Original copyright notices and author attribution (FlopyHU) 
+   must be fully preserved and carried over into all future versions and derivative works.
+6. Asset & Trademark Disclaimer: Brand assets (such as vehicle logos) are accessed 
+   dynamically via live web integration and are never stored, hosted, or distributed 
+   locally within this repository; the author accepts no liability for third-party 
+   asset hosting claims.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
