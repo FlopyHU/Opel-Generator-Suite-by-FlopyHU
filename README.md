@@ -57,7 +57,7 @@ Feel free to use it and share it with other Opel enthusiasts! / Használjátok b
 
 ---
 
-## 📜 License / Licenc
+## 📜 License 
 
 This project is open-source and subject to the terms outlined in the [LICENSE](https://github.com/FlopyHU/Opel-Generator-Suite-by-FlopyHU/blob/main/LICENSE) file. 
 
