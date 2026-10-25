@@ -37,13 +37,13 @@
 
 ## 🛠️ Features / Funkciók
 
-* **Global Data Sync / Globális adatszinkronizáció:** Enter vehicle details (VIN, Model, Engine) once in the Car Pass sidebar, and they automatically populate the Service Book as well.
-* **Dual Design Themes / Kétféle dizájn téma:** Switch between the sleek Modern (Dark Cover) layout and the traditional Classic (Light Cover) style.
-* **Installed Modules Checker / Telepített modulok ellenőrzője:** Pre-marked checkboxes for factory modules (ECM, BCM, CIM, GID, CID, ABS, etc.) plus the ability to add custom modules on the fly.
-* **Dynamic Log Pages / Dinamikus naplóoldalak:** Easily scale and generate up to 20 maintenance and modification log pages in the Service Book.
-* **Bilingual Interface / Kétnyelvű felület:** Instant language toggle between English and Hungarian with fully localized placeholders and UI elements.
-* **PDF Export & Print Guide / PDF mentési segédlet:** Custom modal popup guiding users smoothly through the native print-to-PDF process at 100% scale.
-* **Live Visitor Counter / Valós idejű látogatószámláló:** Integrated all-time visitor tracker with local storage and API fallback redundancy.
+- **Global Data Sync / Globális adatszinkronizáció:** Enter vehicle details (VIN, Model, Engine) once in the Car Pass sidebar, and they automatically populate the Service Book as well.
+- **Dual Design Themes / Kétféle dizájn téma:** Switch between the sleek Modern (Dark Cover) layout and the traditional Classic (Light Cover) style.
+- **Installed Modules Checker / Telepített modulok ellenőrzője:** Pre-marked checkboxes for factory modules (ECM, BCM, CIM, GID, CID, ABS, etc.) plus the ability to add custom modules on the fly.
+- **Dynamic Log Pages / Dinamikus naplóoldalak:** Easily scale and generate up to 20 maintenance and modification log pages in the Service Book.
+- **Bilingual Interface / Kétnyelvű felület:** Instant language toggle between English and Hungarian with fully localized placeholders and UI elements.
+- **PDF Export & Print Guide / PDF mentési segédlet:** Custom modal popup guiding users smoothly through the native print-to-PDF process at 100% scale.
+- **Live Visitor Counter / Valós idejű látogatószámláló:** Integrated all-time visitor tracker with local storage and API fallback redundancy.
 
 ---
 
@@ -57,12 +57,8 @@ Feel free to use it and share it with other Opel enthusiasts! / Használjátok b
 
 ---
 
-> [!IMPORTANT]
-> ## 📜 License / Licenc
-> Copyright (c) 2026 FlopyHU
-> 
-> This project is open-source. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the following strict condition:
-> 
-> **Attribution Requirement:** You must explicitly credit the original author (**FlopyHU**) in your source code, project documentation, or website if you use, modify, or integrate any part of this project.
-> 
-> [HU] A projekt teljesen nyílt forráskódú. Bárki szabadon felhasználhatja, módosíthatja vagy beépítheti a saját szoftverébe, egyetlen szigorú feltétellel: az eredeti szerzőt (**FlopyHU**) egyértelműen meg kell említeni a forráskódban, a projekt leírásában vagy a weboldalon!
+## 📜 License / Licenc
+
+This project is open-source and subject to the terms outlined in the [LICENSE](https://github.com/FlopyHU/Opel-Generator-Suite-by-FlopyHU/blob/main/LICENSE) file. 
+
+[HU] A projekt nyílt forráskódú, a részletes felhasználási feltételeket és jogokat a [LICENSE](https://github.com/FlopyHU/Opel-Generator-Suite-by-FlopyHU/blob/main/LICENSE) fájl tartalmazza.
